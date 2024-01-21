@@ -1,0 +1,63 @@
+:host {
+	--scroll-bar-width = "0px";
+	--header-background-color = "rgba(0, 0, 0, 0)";
+	min-height: 0px;
+	display: flex;
+    flex-direction: column;
+}
+
+table + tbody {
+	display: table-header-group;
+}
+.scrollContainer {
+    display: flex;
+    flex-direction: column;
+	min-height: 0px;
+    width: 100%;
+}
+.xScroll {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	min-height: 0px;
+	overflow: auto hidden;
+	scroll-behavior: smooth;
+}
+
+.yScroll {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	overflow-x: hidden;
+	min-height: 0px;
+	scroll-behavior: smooth;
+}
+
+table {
+	display: table;
+	border-collapse: collapse;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.hdr-spacer {
+	border-spacing: 0px;
+	visibility: collapse;
+}
+
+.__header-table {
+	padding-right: var(--scroll-bar-width);
+	background-image: linear-gradient(var(--header-background-color), var(--header-background-color));
+    background-clip:  padding-box;
+	border-spacing: 0px;
+	border-collapse: separate;
+}
+
+.__body-table {
+	border-spacing: 0px;
+	border-collapse: separate;
+}
+
+.__sub-header {
+	border-spacing: 0px;
+	border-collapse: separate;
+}

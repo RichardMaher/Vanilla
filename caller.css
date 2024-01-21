@@ -1,0 +1,83 @@
+:host {
+	--table-bg-color: #990000;
+}
+	
+table {
+    min-width: 50em;
+}
+  
+.__body-table td  {
+	border-right: 1px solid var(--table-bg-color);
+}
+ .__body-table {
+	border-bottom: 1px solid var(--table-bg-color);
+	border-left: 1px solid var(--table-bg-color);
+}
+  
+tbody > tr:nth-child(odd) {
+  background-color: #eee;
+  color: #000;
+}
+
+tbody > tr:nth-child(even) {
+  background-color: #fff;
+  color: #000;
+}
+
+tbody > tr  th  {
+  background-color: var(--table-bg-color);
+  color: #fff;
+  text-align: left;
+  padding-left: .5em;
+}
+
+tbody > tr  td {
+  vertical-align: top;
+  padding-left: .5em;
+}
+
+.yScroll::-webkit-scrollbar {
+	width: .8em;
+}
+
+.yScroll::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 .2em var(--table-bg-color);
+  background-color: #d3d3d3;}
+
+
+.yScroll::-webkit-scrollbar-thumb {
+  background-color: var(--table-bg-color);
+  border-radius: .4em;
+  outline: 1px solid #fff;
+}
+
+.yScroll::-webkit-scrollbar-thumb:hover {
+  background-color: #ff0000;
+}
+
+.yScroll::-webkit-scrollbar-corner {
+	display: none;
+}
+
+.xScroll::-webkit-scrollbar {
+	height: .8em;
+}
+
+.xScroll::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 .2em var(--table-bg-color);
+  background-color: #d3d3d3;}
+
+
+.xScroll::-webkit-scrollbar-thumb {
+  background-color: var(--table-bg-color);
+  border-radius: .4em;
+  border: 1px solid #fff;
+}
+
+.xScroll::-webkit-scrollbar-thumb:hover {
+  background-color: #ff0000;
+}
+
+.xScroll::-webkit-scrollbar-corner {
+	display: none;
+}
