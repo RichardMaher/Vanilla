@@ -1,4 +1,4 @@
-import globalState from "http://localhost/Vanilla/GlobalStateManager.js";
+import globalState from "/Vanilla/GlobalStateManager.js";
 
 export default class WebPage
 {	
