@@ -9,7 +9,7 @@
 <meta name       = "author" 
 	  content    = "Richard Maher (c)"/>
 <meta name       = "application-name" 
-	  content    = "Pampona">
+	  content    = "Pompona">
 <meta name       = "apple-mobile-web-app-capable" 
 	  content    = "yes" />
 <meta name       = "mobile-web-app-capable" 
@@ -49,10 +49,22 @@
 
 import * as sg from "/Vanilla/ScrollGrid.js";
 import globalState from "/Vanilla/GlobalStateManager.js";
+import HomePage from "http://localhost/Vanilla/HomePage.js";
 import { ABCMenuButton } from "../MenuButton/menu-button.js"
+import RowDetails from "/Vanilla/RowDetails.js";
+	
+document.addEventListener("DOMContentLoaded", initialize);
+
+function preventExit(e)
+{
+	history.pushState({stopExit: true}, "");
+}
 		
 window.addEventListener("load", () =>
 	{
+		preventExit();
+		window.addEventListener('popstate', preventExit);
+		
 		var imageDOM = document.getElementById("crest").contentDocument;
 		var svgRoot = imageDOM.querySelector(':root');
 		var iconStyle = getComputedStyle(document.getElementById("crest"));
@@ -67,30 +79,49 @@ window.addEventListener("load", () =>
 		
 		var crest = imageDOM.getElementById("wa_state_crest");
 	});
-	
-document.addEventListener("DOMContentLoaded", initialize);
 
-function tableLookup(e)
+function buildTableLookup(page)
 {
-	console.log("Lookup for table " + e.target.id);
-	var elementPath = e.composedPath(); // Needs shadowDOM mode 'open'
-	if (elementPath[0].nodeName.toLowerCase() != "td")
-	{
-		return;
-	}
-	
-	var rowClicked = elementPath[1];
-	if (rowClicked.nodeName.toLowerCase() != "tr" || rowClicked.dataset.dbkey == undefined || rowClicked.cells.length < 1)
-	{
-		throw new Error("Bad Row");
-	}
-	
-	var rowPage = document.getElementById("rowDumpTemplate").content.cloneNode(true);
+	var closurePage = page;
 
-	var dbKey = rowClicked.dataset.dbkey;
-	console.log("DB lookup key = " + dbKey);
-	var tableBody = elementPath[2];
-	var colNames = tableBody.dataset.colnames.split(",");
+	function tableLookup(e)
+	{
+		console.log("Lookup for table " + e.target.id);
+		var elementPath = e.composedPath(); // Needs shadowDOM mode 'open'
+		if (elementPath[0].nodeName != "TD")
+		{
+			return;
+		}
+		
+		var rowClicked = elementPath[1];
+		if (rowClicked.nodeName != "TR" || rowClicked.dataset.dbkey == undefined || rowClicked.cells.length < 1)
+		{
+			throw new Error("Bad Row");
+		}
+		
+
+		var dbKey = rowClicked.dataset.dbkey;
+		console.log("DB lookup key = " + dbKey);
+		var tableBody = elementPath[2];
+		var colNames = tableBody.dataset.colNames.split(",");
+		var formData = {"dbKey":{"textContent": dbKey}};
+		var skipCols = 1;
+		var dataCols = 0;
+		for (let i=0; i<colNames.length; i++)
+		{
+			if (--skipCols != 0) {
+				formData[colNames[i]] = {"textContent": ""};
+				continue;
+			}
+				
+			skipCols = rowClicked.children[dataCols].colSpan;
+			formData[colNames[i]] = {"textContent": rowClicked.children[dataCols++].textContent};
+		}
+		closurePage.init(closurePage.root, "span.colValue", formData);
+		closurePage.load();
+	}
+
+	return tableLookup;
 }
 
 async function initialize()
@@ -98,7 +129,11 @@ async function initialize()
     globalState.setItem("pageContainer", document.getElementById("content"));
 	console.log("pc " + globalState.getItem("pageContainer").id);
 	let pageStack = globalState.getItem("pageStack");
-	pageStack[0] = document.getElementById("home");
+
+	let homePage = new HomePage();
+	homePage.root.id = "home";
+	homePage.classList = "page";
+	homePage.load();
 	console.log("ps " + globalState.getItem("pageStack").length);
 	
 	let menuButton = document.getElementById("menuButton");
@@ -147,8 +182,23 @@ async function initialize()
 	{
 		myCSSMod = await import(userStyles, { assert: {type: "css"}});
 	}
+	
+	document.getElementById("backButton").addEventListener("click",
+			(e) => {
+						if (e.target.id != "backButton" || e.target.style.visibility == "hidden") 
+						{
+							Utils.stopEvent(e);
+							return;
+						}
+						
+						let pageStack = globalState.getItem("pageStack");
+						if (pageStack.length < 2)
+							throw new Error("Page stack is corrupt");
+						
+						pageStack[pageStack.length - 1].unload();
+					});
 
-	let options = {dataset: {colnames: "Name,Address,Birth Date,Occupation"}};
+	let options = {dataset: {colNames: "Name,Address,BirthDate,Occupation"}};
 
 	var x = new sg.ScrollGrid("myTable", dimCols, options, myCSSMod.default);
 
@@ -156,7 +206,11 @@ async function initialize()
 
 	demo.appendChild(x.root);
 
-	x.root.addEventListener("click", tableLookup);
+	var detailsPage = new RowDetails("rowDumpTemplate");
+	
+	detailsPage.back();
+	
+	x.root.addEventListener("click", buildTableLookup(detailsPage));
 
 	x.appendRow({dataset: {dbkey: crypto.randomUUID()}},{text: 'foo'},{text: 'foo'},{text: 'foo'}, {text: 'foo'});
 	x.appendRow({dataset: {dbkey: crypto.randomUUID()}},{text: 'foo'},{text: 'foo'},{text: 'foo'}, {text: 'foo'});
@@ -217,8 +271,6 @@ async function initialize()
 	y.appendRow({},{text: 'abc'},{text: 'abc'},{text: 'abc'});
 	y.appendRow({},{text: 'abc'},{text: 'abc'},{text: 'abc'});
 	y.appendRow({},{text: 'abc'},{text: 'abc abc abc abc abc abc abc abc abc abc '},{text: 'abc'});
-
-	y.root.addEventListener("click", tableLookup);
 }
 
 </script>
@@ -238,27 +290,27 @@ async function initialize()
 					<tr>
 						<td><span>DB Lookup Key</span></td>
 						<td>:</td>
-						<td><span class="colValue" name="dbKey">0 00:00.00</span></td>
+						<td><span class="colValue" data-item-name="dbKey"></span></td>
 					</tr>
-					<tr>
+					<tr> 
 						<td><span>Name</span></td>
 						<td>:</td>
-						<td><span id="totalMotion" style="text-align: right;">0 00:00.00</span></td>
+						<td><span class="colValue" data-item-name="Name" style="text-align: right;"></span></td>
 					</tr>
 					<tr>
 						<td><span>Address</span>	</td>
 						<td>:</td>
-						<td><span id="restTime" style="text-align: right;">0 00:00.00</span></td>
+						<td><span class="colValue" data-item-name="Address" style="text-align: right;"></span></td>
 					</tr>
 					<tr>
 						<td><span>Birth Date</span></td>
 						<td>:</td>
-						<td><span id="restStops" style="text-align: right;">0</span></td>
+						<td><span class="colValue" data-item-name="BirthDate" style="text-align: right;"></span></td>
 					</tr>
 					<tr>
 						<td><span>Occupation</span></td>
 						<td>:</td>
-						<td><span id="totalDistance" style="text-align: right;">0</span></td>
+						<td><span class="colValue" data-item-name="Occupation" style="text-align: right;"></span></td>
 					</tr>
 				</tbody>
 			</table>
@@ -267,7 +319,7 @@ async function initialize()
 <div class="wholeScreen">
 	<div id="header">
 		<div class="crestIcon">
-		  <object id="crest" title="Government of Western Australia" alt="Western Australian Coat of Arms" data="/Vanilla/coa.svg" type="image/svg+xml"></object>
+		  <object id="crest" title="Government of Western Australia" alt="Western Australian Coat of Arms" data="../ScaleIt/coa.svg" type="image/svg+xml"></object>
 		</div>
 		<div class="title">
 			<span>A suitable APP title</span>
@@ -277,10 +329,12 @@ async function initialize()
 		</div>
 	</div>
     <div id="content">
-		<div id="home" name="Home" class="page">
-		</div>
 	</div>
-    <div id="footer"><span>This is a footer &copy Copyright Richard Maher</span></div>
+    <div id="footer">
+		<div id="backButton" class="backButton" style="visibility: hidden;">&lt</div>
+		<span>This is a footer &copy Copyright Richard Maher</span>
+		<div class="holder"></div>
+	</div>
 </div>
 </body>
 </html>
