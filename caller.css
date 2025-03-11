@@ -1,5 +1,11 @@
 :host {
 	--table-bg-color: #990000;
+	--header-background-color: #990000
+}
+
+:root {
+	--table-bg-color: #990000;
+	--header-background-color: #990000
 }
 	
 table {
@@ -80,4 +86,17 @@ tbody > tr  td {
 
 .xScroll::-webkit-scrollbar-corner {
 	display: none;
+}
+
+@-moz-document url-prefix() {
+	.xScroll {
+		scrollbar-color: yellow green;
+		scrollbar-width: auto;
+	}
+}
+@-moz-document url-prefix() {
+	.yScroll {
+		scrollbar-color: yellow green;
+		scrollbar-width: auto;
+	}
 }

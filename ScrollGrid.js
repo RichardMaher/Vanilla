@@ -1,5 +1,3 @@
-import sheet from '/Vanilla/ScrollGrid.css' assert {type: 'css'};
-
 import { Utils } from '/Vanilla/Utils.js';
 
 export class ScrollGrid
@@ -39,15 +37,38 @@ export class ScrollGrid
 		this.#host.id = id;
 		this.#shadowRoot = this.#host.attachShadow({mode:"open"});	
 		this.#isScrolling = false;
-		
+
 		if (userStyles != undefined && userStyles != null) {
-			if (userStyles.type == "text/css") {
-				this.#shadowRoot.adoptedStyleSheets.push(userStyles);
+			switch (true) {
+				case	userStyles instanceof URL:
+					console.log("URL");
+					if (!(userStyles.protocol == "http:" || "htps:")) {
+						throw new Error("Invalid protocol for URL");
+					}
+					let link = document.createElement('link');
+					link.href = userStyles.href;
+					link.rel = "stylesheet";
+					link.type = "text/css";
+					this.#shadowRoot.appendChild(link);
+					break;
+				case	userStyles instanceof CSSStyleSheet:
+					console.log("CSSStyleSheet");
+					if (userStyles.type.toLowerCase() != "text/css") {
+						throw new Error("Stylesheet Type must be 'text/css'");
+					}
+					this.#shadowRoot.adoptedStyleSheets.push(userStyles);
+					break;
+				default:
+					throw new Error("The userStyles parameter must be a URL or a CSSStyleSheet");
 			}
 		}
 		
-		this.#shadowRoot.adoptedStyleSheets.push(sheet);
-		    
+		let link = document.createElement('link');
+		link.href = "/Vanilla/ScrollGrid.css";
+		link.rel = "stylesheet";
+		link.type = "text/css";
+		this.#shadowRoot.appendChild(link);
+				    
 		let colsWidth = "";
 		let totalPerc = 0;
 		for (let i=0; i<cols.length; i++)
@@ -64,7 +85,7 @@ export class ScrollGrid
 			throw new Error("Total percent column width must be 100");
 		}
 		
-		this.#shadowRoot.innerHTML = '								\
+		this.#shadowRoot.innerHTML += '								\
 				<div class="scrollContainer">						\
 					<div class="xScroll">							\
 						<table class="__header-table"></table>		\
@@ -121,7 +142,7 @@ export class ScrollGrid
 						for (var j=0; j<mutations[i].addedNodes.length; j++) 
 						{
 							var node = mutations[i].addedNodes[j];
-							if (node.tagName.toLowerCase() == "div" && node.id == root.host.id)
+							if (node.tagName == "DIV" && node.id == root.host.id)
 							{
 								touchDown = true;
 								break outer;

@@ -24,17 +24,20 @@ export class Utils
 	}
 	
 	static findBackgroundColor(elem) {
+			if (typeof elem != "Element")
+				return "rgba(0, 0, 0, 0)";
+			
 			let elemStyle = getComputedStyle(elem);
 			if (elemStyle.backgroundColor != "rgba(0, 0, 0, 0)") 
 			{
 				return elemStyle.backgroundColor;
 			}
 			else {
-				if (elem.parentNode == null) {
+				if (elem.parentNode == null || elem.parentNode.nodeName == "BODY") {
 					return elem.backgrounColor;
 				}
 				else {
-					return findBackgroundColor(elem.parentNode);
+					return this.findBackgroundColor(elem.parentNode);
 				}
 			}
 	}
