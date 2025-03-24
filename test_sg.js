@@ -202,7 +202,7 @@
 
 		// load css at run-time, just to show how
 
-		var userStyles = "/Vanilla/Caller.css";
+		var userStyles = "/Vanilla/caller.css";
 
 		let myCSSMod, userStylesURL;
 		let userSheet = false;
