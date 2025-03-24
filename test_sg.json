@@ -1,0 +1,23 @@
+{
+  "short_name": "Vanilla",
+  "name": "Vanilla Web App",
+  "description": "ScrollGrid Vanilla Javascript demo",
+  "icons": [
+	{
+	  "src": "/Vanilla/Scales.png",
+	  "sizes": "128x128",
+	  "type": "image/png",
+	  "purpose": "any"
+	},
+	{
+	  "src": "/Vanilla/Scales.png",
+	  "sizes": "128x128",
+	  "type": "image/png",
+	  "purpose": "maskable"
+	}
+  ],
+  "start_url": "/Vanilla/test_sg9.html",
+  "background_color": "#00ccdd",
+  "theme_color": "#00ccdd",
+  "display": "fullscreen"
+}
